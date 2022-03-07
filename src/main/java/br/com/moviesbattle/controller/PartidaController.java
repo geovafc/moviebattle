@@ -1,4 +1,4 @@
-package br.com.moviesbattle;
+package br.com.moviesbattle.controller;
 
 import br.com.moviesbattle.dto.PartidaDTO;
 import br.com.moviesbattle.service.PartidaService;
@@ -13,9 +13,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api")
-public class PartidaServiceController {
+public class PartidaController {
 
-    private final Logger log = LoggerFactory.getLogger(PartidaServiceController.class);
+    private final Logger log = LoggerFactory.getLogger(PartidaController.class);
 
     @Autowired
     private PartidaService partidaService;

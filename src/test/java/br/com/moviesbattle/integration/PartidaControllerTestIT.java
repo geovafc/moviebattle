@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class PartidaServiceControllerTestIT {
+public class PartidaControllerTestIT {
 
     @Autowired
     private TestRestTemplate testRestTemplate;
@@ -61,6 +61,18 @@ public class PartidaServiceControllerTestIT {
 
         ResponseEntity<PartidaDTO> response = this.testRestTemplate
                 .exchange("/api/iniciar/"+idJogador, HttpMethod.GET, null, PartidaDTO.class);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    @Test
+    public void deveriaEnviarFilmeMaiorPontuacao() {
+
+        String imdbIDEscolhido = "i";
+        Long idPartida = 1l;
+
+        ResponseEntity<PartidaDTO> response = this.testRestTemplate
+                .exchange("/api/analisar_jogadas/"+imdbIDEscolhido+"/"+idPartida, HttpMethod.GET, null, PartidaDTO.class);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
     }
