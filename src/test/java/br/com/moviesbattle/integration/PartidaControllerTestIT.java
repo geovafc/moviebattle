@@ -60,7 +60,7 @@ public class PartidaControllerTestIT {
         Long idJogador = 1l;
 
         ResponseEntity<PartidaDTO> response = this.testRestTemplate
-                .exchange("/api/iniciar/"+idJogador, HttpMethod.GET, null, PartidaDTO.class);
+                .exchange("/api/partida/iniciar/"+idJogador, HttpMethod.GET, null, PartidaDTO.class);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
     }
@@ -72,7 +72,19 @@ public class PartidaControllerTestIT {
         Long idPartida = 1l;
 
         ResponseEntity<PartidaDTO> response = this.testRestTemplate
-                .exchange("/api/analisar_jogadas/"+imdbIDEscolhido+"/"+idPartida, HttpMethod.GET, null, PartidaDTO.class);
+                .exchange("/api/partida/analisar_jogadas/"+imdbIDEscolhido+"/"+idPartida, HttpMethod.GET, null, PartidaDTO.class);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    @Test
+    public void deveriaEnviarFilmeMenorPontuacao() {
+
+        String imdbIDEscolhido = "j";
+        Long idPartida = 1l;
+
+        ResponseEntity<PartidaDTO> response = this.testRestTemplate
+                .exchange("/api/partida/analisar_jogadas/"+imdbIDEscolhido+"/"+idPartida, HttpMethod.GET, null, PartidaDTO.class);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
     }

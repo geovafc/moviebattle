@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/partida")
 public class PartidaController {
 
     private final Logger log = LoggerFactory.getLogger(PartidaController.class);
@@ -25,6 +25,16 @@ public class PartidaController {
         log.debug("REST requisicao para iniciar a partida : {}", idJogador);
 
         PartidaDTO partidaDTO = partidaService.iniciarPartida(idJogador);
+
+        return ResponseEntity.ok().body(partidaDTO);
+
+    }
+
+    @GetMapping("/analisar_jogadas/{imdbIDEscolhido}/{idPartida}")
+    public ResponseEntity<PartidaDTO> analisarJogada(@PathVariable String imdbIDEscolhido, @PathVariable Long idPartida) {
+        log.debug("REST requisicao para analisar a jogada : {}, {}", imdbIDEscolhido, idPartida);
+
+        PartidaDTO partidaDTO = partidaService.analisarJogada(imdbIDEscolhido, idPartida);
 
         return ResponseEntity.ok().body(partidaDTO);
 
