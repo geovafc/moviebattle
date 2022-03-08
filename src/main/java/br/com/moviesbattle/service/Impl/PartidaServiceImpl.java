@@ -82,8 +82,55 @@ public class PartidaServiceImpl implements PartidaService {
             return partidaDTO;
         }
 
-        parFilmeRepository.save(parFilmesMontado);
+        Partida partida = buildPartida(idJogador, parFilmesMontado);
 
+        filmesDTO = buildFilmeDTO(primeiroFilmeDTO, segundoFilmeDTO, parFilmesMontado, filmes);
+
+        buildPartidaDTO(partidaDTO, filmesDTO, partida);
+
+
+        return partidaDTO;
+    }
+
+    @Override
+    public PartidaDTO analisarJogada(String imdbIDEscolhido, Long idPartida) {
+        log.debug("Requisicao para analisar a jogada");
+
+        PartidaDTO partidaDTO = new PartidaDTO();
+
+        List<Filme> filmes = filmeRepository.findAll();
+
+        Optional<Partida> partida = partidaRepository.findById(idPartida);
+
+        if (partida.get().isFinalizada()) {
+
+            partidaDTO.setMensagemResultado("Essa partida já foi encerrada, inicie uma nova partida para continuar jogando!!!");
+
+            return partidaDTO;
+        }
+
+        Filme filmeMaiorPontuacao = obtemFilmeMaiorPontuacao(filmes, partida);
+
+        if (filmeMaiorPontuacao.getImdbID().equals(imdbIDEscolhido)) {
+            return buildPartidaComAcerto(partidaDTO, partida);
+        }
+
+        if (partida.get().getNumeroErros() == null || partida.get().getNumeroErros() < 3) {
+
+            return buildPartidaComNumeroErrosAtualizado(partidaDTO, partida);
+        }
+
+        return buildPartidaTentativasExcedidas(partidaDTO, partida);
+    }
+
+    private void buildPartidaDTO(PartidaDTO partidaDTO, List<FilmeDTO> filmesDTO, Partida partida) {
+        partidaDTO.setIdPartida(partida.getId());
+        partidaDTO.setMensagemInicio("Escolha qual dos filmes possuem a melhor avaliação no IMDB");
+        partidaDTO.setFilmes(filmesDTO);
+    }
+
+    private List<FilmeDTO> buildFilmeDTO(FilmeDTO primeiroFilmeDTO, FilmeDTO segundoFilmeDTO, ParFilme parFilmesMontado, List<Filme> filmes) {
+        List<FilmeDTO> filmesDTO;
         String imdbIFilmeUm = parFilmesMontado.getImdbIDFilmeUm();
         String imdbIFilmeDois = parFilmesMontado.getImdbIDFilmeDois();
 
@@ -91,12 +138,21 @@ public class PartidaServiceImpl implements PartidaService {
         Filme segundoFilme = obtemFilmeApartirImdbI(imdbIFilmeDois, filmes);
 
         filmesDTO = buildListaFilmesDTO(primeiroFilmeDTO, segundoFilmeDTO, primeiroFilme, segundoFilme);
+        return filmesDTO;
+    }
 
-        partidaDTO.setMensagemInicio("Escolha qual dos filmes possuem a melhor avaliação no IMDB");
-        partidaDTO.setFilmes(filmesDTO);
+    private Partida buildPartida(Long idJogador, ParFilme parFilmesMontado) {
+        Optional<Jogador> jogador = jogadorRepository.findById(idJogador);
 
+        parFilmeRepository.save(parFilmesMontado);
 
-        return partidaDTO;
+        Partida partida = new Partida();
+        partida.setJogador(jogador.get());
+        partida.setParFilme(parFilmesMontado);
+
+        partidaRepository.save(partida);
+
+        return partida;
     }
 
     private List<FilmeDTO> buildListaFilmesDTO(FilmeDTO primeiroFilmeDTO, FilmeDTO segundoFilmeDTO, Filme primeiroFilme, Filme segundoFilme) {
@@ -133,36 +189,7 @@ public class PartidaServiceImpl implements PartidaService {
         parFilmesMontado.setImdbIDFilmeDois(imdbIDFilmeDois);
     }
 
-    @Override
-    public PartidaDTO analisarJogada(String imdbIDEscolhido, Long idPartida) {
-        log.debug("Requisicao para analisar a jogada");
 
-        PartidaDTO partidaDTO = new PartidaDTO();
-
-        List<Filme> filmes = filmeRepository.findAll();
-
-        Optional<Partida> partida = partidaRepository.findById(idPartida);
-
-        if (partida.get().isFinalizada()) {
-
-            partidaDTO.setMensagemResultado("Essa partida já foi encerrada, inicie uma nova partida para continuar jogando!!!");
-
-            return partidaDTO;
-        }
-
-        Filme filmeMaiorPontuacao = obtemFilmeMaiorPontuacao(filmes, partida);
-
-        if (filmeMaiorPontuacao.getImdbID().equals(imdbIDEscolhido)) {
-            return buildPartidaComAcerto(partidaDTO, partida);
-        }
-
-        if (partida.get().getNumeroErros() == null || partida.get().getNumeroErros() < 3) {
-
-            return buildPartidaComNumeroErrosAtualizado(partidaDTO, partida);
-        }
-
-        return buildPartidaTentativasExcedidas(partidaDTO, partida);
-    }
 
     private Filme obtemFilmeMaiorPontuacao(List<Filme> filmes, Optional<Partida> partida) {
         String imdbPrimeiroFilmeMostradoUsuario = partida.get().getParFilme().getImdbIDFilmeUm();

@@ -12,6 +12,7 @@ import java.util.List;
 @Data
 @ToString
 public class PartidaDTO {
+    private Long idPartida;
     private String mensagemInicio;
     private String mensagemResultado;
     private List<FilmeDTO> filmes;

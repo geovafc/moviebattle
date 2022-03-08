@@ -54,6 +54,7 @@ public class PartidaServiceTest {
 
         when(filmeRepository.findAll()).thenReturn(buildFilmesEsperado());
         when(parFilmeRepository.findAll()).thenReturn(buildParFilmesUsadosEsperado());
+        when(jogadorRepository.findById(idJogador)).thenReturn(Optional.of(buildJogadorEsperado()));
 
         PartidaDTO filmesPartida = partidaService.iniciarPartida(idJogador);
 
@@ -206,14 +207,19 @@ public class PartidaServiceTest {
         parFilme.setImdbIDFilmeUm("i");
         parFilme.setImdbIDFilmeDois("j");
 
-        Jogador jogador = new Jogador();
-        jogador.setId(1l);
+        Jogador jogador = buildJogadorEsperado();
 
         Partida partida = new Partida();
         partida.setParFilme(parFilme);
         partida.setJogador(jogador);
 
         return Optional.of(partida);
+    }
+
+    private Jogador buildJogadorEsperado() {
+        Jogador jogador = new Jogador();
+        jogador.setId(1l);
+        return jogador;
     }
 
 

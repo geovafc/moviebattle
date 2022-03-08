@@ -41,13 +41,22 @@ public class FilmeServiceImpl implements FilmeService {
             OmdbFilmeDTO omdbFilmeDTO = omdbFilmeRepository.obterOmdbFilme(imdbid);
 
 
-            filme = new Filme();
-            filme.setTitulo(omdbFilmeDTO.getTitle());
-            filme.setImdbVotos(Long.getLong(omdbFilmeDTO.getImdbVotes()));
-            filme.setImdbAvaliacao(Float.valueOf(omdbFilmeDTO.getImdbRating()));
+            filme = buildFilme(omdbFilmeDTO);
 
             filmeRepository.save(filme);
         }
+    }
+
+    private Filme buildFilme(OmdbFilmeDTO omdbFilmeDTO) {
+        Filme filme;
+        String votos = omdbFilmeDTO.getImdbVotes().replace(",","");
+
+        filme = new Filme();
+        filme.setTitulo(omdbFilmeDTO.getTitle());
+        filme.setImdbID(omdbFilmeDTO.getImdbID());
+        filme.setImdbVotos(Long.valueOf(votos));
+        filme.setImdbAvaliacao(Float.valueOf(omdbFilmeDTO.getImdbRating()));
+        return filme;
     }
 
 
