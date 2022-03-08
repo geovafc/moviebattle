@@ -1,4 +1,4 @@
-package br.com.moviesbattle.service;
+package br.com.moviesbattle.service.Impl;
 
 import br.com.moviesbattle.domain.Filme;
 import br.com.moviesbattle.domain.Jogador;
@@ -10,6 +10,7 @@ import br.com.moviesbattle.repository.FilmeRepository;
 import br.com.moviesbattle.repository.JogadorRepository;
 import br.com.moviesbattle.repository.ParFilmeRepository;
 import br.com.moviesbattle.repository.PartidaRepository;
+import br.com.moviesbattle.service.PartidaService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,19 +57,29 @@ public class PartidaServiceImpl implements PartidaService {
         boolean isParMontado = false;
         boolean isParFilmeJaUsado = false;
 
-        int quantidadeFilmesUsados = filmes.size();
+        int quantidadeFilmesParaMontarPar = filmes.size();
 
-        while (isParMontado == false && quantidadeFilmesUsados > 0) {
+        boolean isFilmeRepetido;
 
-            montaParFilmes(parFilmesMontado, filmes, quantidadeFilmesUsados);
-            quantidadeFilmesUsados = quantidadeFilmesUsados - 2;
+        while (isParMontado == false && quantidadeFilmesParaMontarPar > 0) {
+
+            montaParFilmes(parFilmesMontado, filmes, quantidadeFilmesParaMontarPar);
+            quantidadeFilmesParaMontarPar = quantidadeFilmesParaMontarPar - 2;
 
 
             isParFilmeJaUsado = verificaParFilmeMontadoJaFoiUsado(parFilmesMontado, streamSupplierParFilme);
 
-            if (isParFilmeJaUsado == false) {
+            isFilmeRepetido = parFilmesMontado.getImdbIDFilmeUm().equals(parFilmesMontado.getImdbIDFilmeDois());
+
+            if (isParFilmeJaUsado == false && isFilmeRepetido == false) {
                 isParMontado = true;
             }
+        }
+
+        if (quantidadeFilmesParaMontarPar == 0){
+            partidaDTO.setMensagemInicio("Jogo encerrado, todos os filmes já participaram do jogo!!!");
+
+            return partidaDTO;
         }
 
         parFilmeRepository.save(parFilmesMontado);
@@ -114,9 +125,9 @@ public class PartidaServiceImpl implements PartidaService {
         return parFilmeJaUsado;
     }
 
-    private void montaParFilmes(ParFilme parFilmesMontado, List<Filme> filmes, int quantidadeFilmesUsados) {
-        String imdbIDFilmeUm = filmes.get(quantidadeFilmesUsados - 1).getImdbID();
-        String imdbIDFilmeDois = filmes.get(quantidadeFilmesUsados - 2).getImdbID();
+    private void montaParFilmes(ParFilme parFilmesMontado, List<Filme> filmes, int quantidadeFilmesParaMontarPar) {
+        String imdbIDFilmeUm = filmes.get(quantidadeFilmesParaMontarPar - 1).getImdbID();
+        String imdbIDFilmeDois = filmes.get(quantidadeFilmesParaMontarPar - 2).getImdbID();
 
         parFilmesMontado.setImdbIDFilmeUm(imdbIDFilmeUm);
         parFilmesMontado.setImdbIDFilmeDois(imdbIDFilmeDois);
@@ -176,7 +187,7 @@ public class PartidaServiceImpl implements PartidaService {
 
     private PartidaDTO buildPartidaComAcerto(PartidaDTO partidaDTO, Optional<Partida> partida) {
         Jogador jogador = partida.get().getJogador();
-        Long novaPontuacao = (jogador.getPontuacao() == null) ? 0 : jogador.getPontuacao() + 1;
+        Long novaPontuacao = (jogador.getPontuacao() == null) ? 1 : jogador.getPontuacao() + 1;
         jogador.setPontuacao(novaPontuacao);
 
         partidaDTO.setMensagemResultado("Você acertou, inicie uma nova partida");

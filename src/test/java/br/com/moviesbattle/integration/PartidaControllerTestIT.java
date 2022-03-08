@@ -50,7 +50,6 @@ public class PartidaControllerTestIT {
     public void iniciar() {
         filmeRepository.saveAll(buildFilmesEsperado());
         parFilmeRepository.saveAll(buildParFilmesUsadosEsperado());
-//        jogadorRepository.save()
         partidaRepository.save(buildPartidaEsperado());
     }
 
@@ -60,7 +59,7 @@ public class PartidaControllerTestIT {
         Long idJogador = 1l;
 
         ResponseEntity<PartidaDTO> response = this.testRestTemplate
-                .exchange("/api/partida/iniciar/"+idJogador, HttpMethod.GET, null, PartidaDTO.class);
+                .exchange("/api/partida/iniciar/" + idJogador, HttpMethod.GET, null, PartidaDTO.class);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
     }
@@ -72,7 +71,7 @@ public class PartidaControllerTestIT {
         Long idPartida = 1l;
 
         ResponseEntity<PartidaDTO> response = this.testRestTemplate
-                .exchange("/api/partida/analisar_jogadas/"+imdbIDEscolhido+"/"+idPartida, HttpMethod.GET, null, PartidaDTO.class);
+                .exchange("/api/partida/analisar_jogadas/" + imdbIDEscolhido + "/" + idPartida, HttpMethod.GET, null, PartidaDTO.class);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
     }
@@ -84,7 +83,7 @@ public class PartidaControllerTestIT {
         Long idPartida = 1l;
 
         ResponseEntity<PartidaDTO> response = this.testRestTemplate
-                .exchange("/api/partida/analisar_jogadas/"+imdbIDEscolhido+"/"+idPartida, HttpMethod.GET, null, PartidaDTO.class);
+                .exchange("/api/partida/analisar_jogadas/" + imdbIDEscolhido + "/" + idPartida, HttpMethod.GET, null, PartidaDTO.class);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
     }
@@ -191,4 +190,5 @@ public class PartidaControllerTestIT {
 
         return partida;
     }
+
 }

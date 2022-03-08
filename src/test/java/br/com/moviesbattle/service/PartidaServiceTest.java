@@ -10,6 +10,7 @@ import br.com.moviesbattle.repository.FilmeRepository;
 import br.com.moviesbattle.repository.JogadorRepository;
 import br.com.moviesbattle.repository.ParFilmeRepository;
 import br.com.moviesbattle.repository.PartidaRepository;
+import br.com.moviesbattle.service.Impl.PartidaServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -157,7 +158,6 @@ public class PartidaServiceTest {
         filme10.setTitulo("Thor");
         filme10.setImdbAvaliacao(9.9f);
         filme10.setImdbVotos(2350l);
-
 
         return Arrays.asList(filme, filme2, filme3, filme4, filme5, filme6, filme7, filme8, filme9, filme10);
     }
