@@ -1,27 +1,20 @@
 package br.com.moviesbattle.service;
 
-import br.com.moviesbattle.domain.Filme;
-import br.com.moviesbattle.domain.Jogador;
-import br.com.moviesbattle.domain.ParFilme;
-import br.com.moviesbattle.domain.Partida;
+import br.com.moviesbattle.domain.*;
 import br.com.moviesbattle.dto.FilmeDTO;
 import br.com.moviesbattle.dto.PartidaDTO;
-import br.com.moviesbattle.repository.FilmeRepository;
-import br.com.moviesbattle.repository.JogadorRepository;
-import br.com.moviesbattle.repository.ParFilmeRepository;
-import br.com.moviesbattle.repository.PartidaRepository;
+import br.com.moviesbattle.repository.*;
+import br.com.moviesbattle.security.SecurityUtils;
 import br.com.moviesbattle.service.Impl.PartidaServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.mockito.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Arrays;
@@ -43,6 +36,9 @@ public class PartidaServiceTest {
     @Mock
     private JogadorRepository jogadorRepository;
 
+    @Mock
+    private UsuarioRepository usuarioRepository;
+
     @InjectMocks
     @Spy
     private PartidaService partidaService = new PartidaServiceImpl();
@@ -55,13 +51,29 @@ public class PartidaServiceTest {
         when(filmeRepository.findAll()).thenReturn(buildFilmesEsperado());
         when(parFilmeRepository.findAll()).thenReturn(buildParFilmesUsadosEsperado());
         when(jogadorRepository.findById(idJogador)).thenReturn(Optional.of(buildJogadorEsperado()));
+        when(usuarioRepository.findByNomeUsuario("ada")).thenReturn(builderUsuario());
 
-        PartidaDTO filmesPartida = partidaService.iniciarPartida(idJogador);
+        try (MockedStatic<SecurityUtils> mockedStatic = Mockito.mockStatic(SecurityUtils.class)) {
+            mockedStatic.when(() -> SecurityUtils.getCurrentUserLogin()).thenReturn(Optional.of("ada"));
 
-        verify(parFilmeRepository).save(any());
+            PartidaDTO filmesPartida = partidaService.iniciarPartida();
 
-        assertEquals(filmesPartida.getMensagemInicio(), mensagemInicioEsperada);
-        assertEquals(filmesPartida.getFilmes().size(), 2);
+            verify(parFilmeRepository).save(any());
+
+            assertEquals(filmesPartida.getMensagemInicio(), mensagemInicioEsperada);
+            assertEquals(filmesPartida.getFilmes().size(), 2);
+
+        }
+
+    }
+
+    private Usuario builderUsuario() {
+        var usuario = new Usuario();
+        usuario.setId(1l);
+        usuario.setNomeUsuario("ada");
+        usuario.setJogador(buildJogadorEsperado());
+
+        return usuario;
     }
 
     @Test

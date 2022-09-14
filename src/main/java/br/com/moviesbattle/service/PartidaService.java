@@ -4,7 +4,9 @@ import br.com.moviesbattle.dto.PartidaDTO;
 
 public interface PartidaService {
 
-    PartidaDTO iniciarPartida(Long idJogador);
+    PartidaDTO iniciarPartida();
 
     PartidaDTO analisarJogada(String imdbIDEscolhido, Long idPartida);
+
+    void encerrarPartida() throws Exception;
 }

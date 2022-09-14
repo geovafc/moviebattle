@@ -28,4 +28,7 @@ public class Partida {
     @OneToOne
     private ParFilme parFilme;
 
+    public void  finalizaPartida() {
+        this.setFinalizada(true);
+    }
 }

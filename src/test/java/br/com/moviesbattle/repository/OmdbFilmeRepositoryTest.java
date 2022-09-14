@@ -32,7 +32,7 @@ public class OmdbFilmeRepositoryTest {
         filme.setImdbID("tt3896198");
         filme.setTitle("Guardians of the Galaxy Vol. 2");
         filme.setImdbRating("7.6");
-        filme.setImdbVotes("636,391");
+        filme.setImdbVotes("665,736");
 
         return filme;
     }

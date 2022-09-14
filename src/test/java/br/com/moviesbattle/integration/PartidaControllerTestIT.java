@@ -59,7 +59,8 @@ public class PartidaControllerTestIT {
         Long idJogador = 1l;
 
         ResponseEntity<PartidaDTO> response = this.testRestTemplate
-                .exchange("/api/partida/iniciar/" + idJogador, HttpMethod.GET, null, PartidaDTO.class);
+                .withBasicAuth("ada","ada")
+                .exchange("/api/partidas/iniciar", HttpMethod.GET, null, PartidaDTO.class);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
     }
@@ -71,7 +72,8 @@ public class PartidaControllerTestIT {
         Long idPartida = 1l;
 
         ResponseEntity<PartidaDTO> response = this.testRestTemplate
-                .exchange("/api/partida/analisar_jogadas/" + imdbIDEscolhido + "/" + idPartida, HttpMethod.GET, null, PartidaDTO.class);
+                .withBasicAuth("ada","ada")
+                .exchange("/api/partidas/analisar_jogadas/" + imdbIDEscolhido + "/" + idPartida, HttpMethod.GET, null, PartidaDTO.class);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
     }
@@ -83,7 +85,8 @@ public class PartidaControllerTestIT {
         Long idPartida = 1l;
 
         ResponseEntity<PartidaDTO> response = this.testRestTemplate
-                .exchange("/api/partida/analisar_jogadas/" + imdbIDEscolhido + "/" + idPartida, HttpMethod.GET, null, PartidaDTO.class);
+                .withBasicAuth("ada","ada")
+                .exchange("/api/partidas/analisar_jogadas/" + imdbIDEscolhido + "/" + idPartida, HttpMethod.GET, null, PartidaDTO.class);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
     }

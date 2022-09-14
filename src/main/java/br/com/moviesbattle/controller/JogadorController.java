@@ -2,6 +2,8 @@ package br.com.moviesbattle.controller;
 
 import br.com.moviesbattle.dto.JogadorDTO;
 import br.com.moviesbattle.service.JogadorService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/jogadores")
+@SecurityRequirement(name = "adadev")
 public class JogadorController {
 
     private final Logger log = LoggerFactory.getLogger(JogadorController.class);
@@ -21,6 +24,7 @@ public class JogadorController {
     @Autowired
     private JogadorService jogadorService;
 
+    @Operation(summary = "Pontuação dos jogadores")
     @GetMapping("/ranking")
     public ResponseEntity<List<JogadorDTO>> ranking() {
         log.debug("REST requisicao para mostrar o ranking dos jogadores");

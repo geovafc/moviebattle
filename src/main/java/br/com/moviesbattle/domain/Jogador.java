@@ -28,4 +28,7 @@ public class Jogador {
 
     @OneToMany(mappedBy = "jogador")
     private List<Partida> partidas = new ArrayList<>();
+
+
+
 }

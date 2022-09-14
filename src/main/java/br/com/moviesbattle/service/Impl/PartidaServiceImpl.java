@@ -6,10 +6,8 @@ import br.com.moviesbattle.domain.ParFilme;
 import br.com.moviesbattle.domain.Partida;
 import br.com.moviesbattle.dto.FilmeDTO;
 import br.com.moviesbattle.dto.PartidaDTO;
-import br.com.moviesbattle.repository.FilmeRepository;
-import br.com.moviesbattle.repository.JogadorRepository;
-import br.com.moviesbattle.repository.ParFilmeRepository;
-import br.com.moviesbattle.repository.PartidaRepository;
+import br.com.moviesbattle.repository.*;
+import br.com.moviesbattle.security.SecurityUtils;
 import br.com.moviesbattle.service.PartidaService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,12 +33,17 @@ public class PartidaServiceImpl implements PartidaService {
     @Autowired
     private JogadorRepository jogadorRepository;
 
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+
     private final Logger log = LoggerFactory.getLogger(PartidaServiceImpl.class);
 
     @Override
-    public PartidaDTO iniciarPartida(Long idJogador) {
+    public PartidaDTO iniciarPartida() {
 
         log.debug("Requisicao para iniciar a partida");
+
+        Long idJogador = obterJogadorLogado().getId();
 
         PartidaDTO partidaDTO = new PartidaDTO();
         FilmeDTO primeiroFilmeDTO = new FilmeDTO();
@@ -76,7 +79,7 @@ public class PartidaServiceImpl implements PartidaService {
             }
         }
 
-        if (quantidadeFilmesParaMontarPar == 0){
+        if (quantidadeFilmesParaMontarPar == 0) {
             partidaDTO.setMensagemInicio("Jogo encerrado, todos os filmes já participaram do jogo!!!");
 
             return partidaDTO;
@@ -90,6 +93,12 @@ public class PartidaServiceImpl implements PartidaService {
 
 
         return partidaDTO;
+    }
+
+    private Jogador obterJogadorLogado() {
+        String nomeUsuario = SecurityUtils.getCurrentUserLogin().get();
+        var usuario = usuarioRepository.findByNomeUsuario(nomeUsuario);
+        return usuario.getJogador();
     }
 
     @Override
@@ -121,6 +130,19 @@ public class PartidaServiceImpl implements PartidaService {
         }
 
         return buildPartidaTentativasExcedidas(partidaDTO, partida);
+    }
+
+    @Override
+    public void encerrarPartida() throws Exception {
+        var jogadorLogado = obterJogadorLogado();
+
+        var partida = jogadorLogado.getPartidas()
+                .stream()
+                .filter(p -> p.isFinalizada() == false)
+                .findFirst()
+                .orElseThrow(() -> new Exception("Você precisa ter uma partida iniciada para poder realizar essa operação"));
+
+        encerramentoPartida(partida);
     }
 
     private void buildPartidaDTO(PartidaDTO partidaDTO, List<FilmeDTO> filmesDTO, Partida partida) {
@@ -190,7 +212,6 @@ public class PartidaServiceImpl implements PartidaService {
     }
 
 
-
     private Filme obtemFilmeMaiorPontuacao(List<Filme> filmes, Optional<Partida> partida) {
         String imdbPrimeiroFilmeMostradoUsuario = partida.get().getParFilme().getImdbIDFilmeUm();
         String imdbSegundoFilmeMostradoUsuario = partida.get().getParFilme().getImdbIDFilmeDois();
@@ -247,10 +268,14 @@ public class PartidaServiceImpl implements PartidaService {
     private PartidaDTO buildPartidaTentativasExcedidas(PartidaDTO partidaDTO, Optional<Partida> partida) {
         partidaDTO.setMensagemResultado("Você excedeu o número de tentativas, inicie uma nova partida!!!");
 
-        partida.get().setFinalizada(true);
-        partidaRepository.save(partida.get());
+        encerramentoPartida(partida.get());
 
         return partidaDTO;
+    }
+
+    private void encerramentoPartida(Partida partida) {
+        partida.finalizaPartida();
+        partidaRepository.save(partida);
     }
 
 }
